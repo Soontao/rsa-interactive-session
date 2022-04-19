@@ -1,4 +1,4 @@
-module fornever.org
+module github.com/Soontao/rsa-interactive-session
 
 go 1.14
 

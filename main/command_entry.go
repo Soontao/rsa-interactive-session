@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fornever.org/app"
+	"github.com/Soontao/rsa-interactive-session/app"
 	"github.com/urfave/cli"
 )
 

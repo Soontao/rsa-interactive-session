@@ -6,22 +6,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestValue(t *testing.T) {
+func TestNewPrime(t *testing.T) {
 	assert := assert.New(t)
-	tests := []struct {
-		name string
-		want string
-	}{
-		{
-			"basic test",
-			"hello golang",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := Value(); got != tt.want {
-				assert.Equal(tt.want, got)
-			}
-		})
-	}
+	p := NewPrime(1000)
+	assert.NotNil(p)
+}
+
+func TestKeyPair(t *testing.T) {
+	assert := assert.New(t)
+	p := NewKeyPair(1000)
+
+	assert.NotNil(p)
+
+	assert.Equal(p.N.Int64(), p.E.Int64()*p.D.Int64())
 }
