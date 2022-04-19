@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,9 +15,51 @@ func TestNewPrime(t *testing.T) {
 
 func TestKeyPair(t *testing.T) {
 	assert := assert.New(t)
-	p := NewKeyPair(1000)
-
+	p := NewKeyPair(100000)
 	assert.NotNil(p)
+	assert.Equal(p.N.Int64(), p.P.Int64()*p.Q.Int64())
+	P := p.P.Int64()
+	Q := p.Q.Int64()
+	L := p.L.Int64()
+	E := p.E.Int64()
+	D := p.D.Int64()
+	N := p.N.Int64()
 
-	assert.Equal(p.N.Int64(), p.E.Int64()*p.D.Int64())
+	assert.EqualValues(P*Q, N)
+	assert.EqualValues(0, L%(P-1))
+	assert.EqualValues(0, L%(Q-1))
+
+	assert.Greater(E, int64(1))
+	assert.Less(E, L)
+
+	assert.EqualValues((E*D)%L, 1)
+}
+
+func TestEncryptDecryptManual(t *testing.T) {
+	assert := assert.New(t)
+	p := &KeyPair{
+		N: big.NewInt(323),
+		E: big.NewInt(5),
+		D: big.NewInt(29),
+	}
+	encrypted := p.Encrypt([]byte("hello rsa"))
+	decrypted := p.Decrypt(encrypted)
+	assert.EqualValues("hello rsa", string(decrypted))
+}
+
+func TestEncryptDecryptAuto(t *testing.T) {
+	assert := assert.New(t)
+	p := NewKeyPair(1000)
+	encrypted := p.Encrypt([]byte("hello rsa"))
+	decrypted := p.Decrypt(encrypted)
+	assert.EqualValues("hello rsa", decrypted)
+}
+
+func TestDoSignature(t *testing.T) {
+	assert := assert.New(t)
+	p := NewKeyPair(0)
+	msg := []byte("hello rsa")
+	sig := p.Sign(msg)
+	result := p.Verify(msg, sig)
+	assert.True(result)
 }
