@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"encoding/json"
 	"math/big"
 	"testing"
 
@@ -62,6 +63,19 @@ func TestEncryptDecryptMagic(t *testing.T) {
 	encrypted := p.Encrypt([]byte("hello rsa"))
 	decrypted := p.Decrypt(encrypted)
 	assert.EqualValues("hello rsa", decrypted)
+}
+
+func TestSerializeAndDeserilization(t *testing.T) {
+	assert := assert.New(t)
+	p := NewKeyPair(0)
+	bytes, err := json.Marshal(p)
+	assert.Nil(err)
+	cp := &KeyPair{}
+	err = json.Unmarshal(bytes, cp)
+	assert.Nil(err)
+	encryped1 := p.Encrypt([]byte("whatever"))
+	encryped2 := cp.Encrypt([]byte("whatever"))
+	assert.EqualValues(encryped1, encryped2)
 }
 
 func TestDoSignature(t *testing.T) {

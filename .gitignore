@@ -23,6 +23,7 @@ main/main
 main/build
 main/*.zip
 main/output
+__debug_bin
 
 # launch 
 .vscode/launch.json
