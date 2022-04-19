@@ -66,10 +66,10 @@ jobs:
           APPNAME: ${{steps.appname.outputs.prop}} 
           APPDESCRIPTION: ${{steps.app-description.outputs.prop}} 
 
-      - name: upload artifact
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          # Artifact name
-          name: SNAPSHOTS-Build
-          # Directory containing files to upload
-          path: main/build
+      # - name: upload artifact
+      #   uses: actions/upload-artifact@v1.0.0
+      #   with:
+      #     # Artifact name
+      #     name: SNAPSHOTS-Build
+      #     # Directory containing files to upload
+      #     path: main/build
