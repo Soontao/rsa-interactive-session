@@ -32,7 +32,6 @@ func (k *KeyPair) Encrypt(msg []byte) (enctypedParts []*big.Int) {
 
 // Verify signature, by public key, decrypt signature by the Encryption number
 func (k *KeyPair) Verify(msg []byte, signature []*big.Int) bool {
-
 	// compute hash local
 	expectedHash := BytesToBigInt(k.HashMsg(msg))
 
