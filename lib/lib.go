@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"hash/fnv"
+	"crypto/sha256"
 	"math/big"
 	"math/rand"
 	"time"
@@ -22,33 +22,15 @@ type KeyPair struct {
 	N *big.Int
 }
 
-func (k *KeyPair) Encrypt(rawMsg []byte) (enctypedBytes []*big.Int) {
-	for _, rawByte := range rawMsg {
-		enctypedBytes = append(enctypedBytes, big.NewInt(1).Exp(big.NewInt(int64(rawByte)), k.E, k.N))
+// Encrypt message, by public key, encrypt message by the Encryption number
+func (k *KeyPair) Encrypt(msg []byte) (enctypedParts []*big.Int) {
+	for _, msgPart := range msg {
+		enctypedParts = append(enctypedParts, big.NewInt(1).Exp(big.NewInt(int64(msgPart)), k.E, k.N))
 	}
 	return
 }
 
-func (k *KeyPair) Decrypt(encrtypedMsg []*big.Int) (bytes []byte) {
-
-	for _, encryptedByte := range encrtypedMsg {
-		bytes = append(bytes, uint8(big.NewInt(1).Exp(encryptedByte, k.D, k.N).Int64()))
-	}
-
-	return
-}
-
-func (k *KeyPair) HashMsg(msg []byte) []byte {
-	return fnv.New32a().Sum(msg)
-}
-
-func (k *KeyPair) Sign(msg []byte) (signature []*big.Int) {
-	for _, msgHashPart := range k.HashMsg(msg) {
-		signature = append(signature, big.NewInt(1).Exp(big.NewInt(int64(msgHashPart)), k.D, k.N))
-	}
-	return
-}
-
+// Verify signature, by public key, decrypt signature by the Encryption number
 func (k *KeyPair) Verify(msg []byte, signature []*big.Int) bool {
 
 	// compute hash local
@@ -69,7 +51,30 @@ func (k *KeyPair) Verify(msg []byte, signature []*big.Int) bool {
 	}
 
 	return true
+}
 
+// Decrypt message, by private key,
+func (k *KeyPair) Decrypt(encrtypedMsg []*big.Int) (bytes []byte) {
+
+	for _, encryptedByte := range encrtypedMsg {
+		bytes = append(bytes, uint8(big.NewInt(1).Exp(encryptedByte, k.D, k.N).Int64()))
+	}
+
+	return
+}
+
+// Sign signature for message, by private key, use the decryption number (to encrypt)
+//
+// it will looks like Encrypt
+func (k *KeyPair) Sign(msg []byte) (signature []*big.Int) {
+	for _, msgHashPart := range k.HashMsg(msg) {
+		signature = append(signature, big.NewInt(1).Exp(big.NewInt(int64(msgHashPart)), k.D, k.N))
+	}
+	return
+}
+
+func (k *KeyPair) HashMsg(msg []byte) []byte {
+	return sha256.New().Sum(msg)
 }
 
 // NewPrime with range, if n <= 1, will create a real random prime

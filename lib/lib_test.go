@@ -55,6 +55,15 @@ func TestEncryptDecryptAuto(t *testing.T) {
 	assert.EqualValues("hello rsa", decrypted)
 }
 
+func TestEncryptDecryptMagic(t *testing.T) {
+	assert := assert.New(t)
+	p := NewKeyPair(1000)
+	p.D, p.E = p.E, p.D // swap the encryption & decryption number
+	encrypted := p.Encrypt([]byte("hello rsa"))
+	decrypted := p.Decrypt(encrypted)
+	assert.EqualValues("hello rsa", decrypted)
+}
+
 func TestDoSignature(t *testing.T) {
 	assert := assert.New(t)
 	p := NewKeyPair(0)
@@ -62,4 +71,14 @@ func TestDoSignature(t *testing.T) {
 	sig := p.Sign(msg)
 	result := p.Verify(msg, sig)
 	assert.True(result)
+	assert.NotEqualValues(p.Sign([]byte("hello rsa")), p.Sign([]byte("hello rs2")))
+}
+
+func TestDoSignatureFailed(t *testing.T) {
+	assert := assert.New(t)
+	p := NewKeyPair(0)
+	msg := []byte("hello rs2")
+	sig := p.Sign(msg)
+	result := p.Verify([]byte("hello rsa"), sig)
+	assert.False(result)
 }
